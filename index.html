@@ -53,7 +53,7 @@ footer{grid-column:1/3;display:flex;justify-content:space-between;font-size:2vh;
 </main>
 <aside>
   <div class="panel" id="timer">–<small id="timerlabel">Sekunden</small></div>
-  <div class="panel" id="mit"><h2 class="serif">Spiel mit!</h2><div class="site">Handy, Kamera, QR</div><div id="qr"></div><div class="site" id="kurzurl"></div></div>
+  <div class="panel" id="mit"><h2 class="serif">Spiel mit!</h2><div class="site">Handy, Kamera, QR</div><div id="qr"></div></div>
 </aside>
 <footer><span>Projektwoche 2026 · Digitales Schulquiz durch die Schulgeschichte</span><span id="hint">Leertaste: Pause · F Vollbild · S Zeit neu holen</span></footer>
 </div>
@@ -111,6 +111,5 @@ document.addEventListener("keydown",e=>{
 });
 document.addEventListener("click",wach);
 async function wach(){ try{ if(navigator.wakeLock && !window._wl){ window._wl=await navigator.wakeLock.request("screen") } }catch(e){} }
-document.getElementById("kurzurl").textContent=SPIEL.replace(/^https?:\/\//,"");
 konfetti(36); qrMalen(); syncZeit().then(tick); setInterval(syncZeit,300000); setInterval(tick,250);
 </script></body></html>
