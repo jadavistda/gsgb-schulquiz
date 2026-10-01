@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>GSGB-Schulquiz · 50 Jahre · mitspielen</title>
+<style>
+:root{--bg:#1d1d2b;--card:#2a2a3d;--ink:#fff;--r:#e21b3c;--b:#1368ce;--y:#d89e00;--g:#26890c;--muted:#b8b8c8}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;touch-action:manipulation}
+#app{display:flex;flex-direction:column;min-height:100vh;padding:12px;gap:10px}
+header{display:flex;justify-content:space-between;align-items:center;font-size:15px;color:var(--muted)}
+header b{color:var(--ink);font-size:17px}
+#bar{height:8px;background:var(--card);border-radius:4px;overflow:hidden}#bar i{display:block;height:100%;background:#fff;width:0;transition:width .25s linear}
+#frage{background:#fff;color:#111;border-radius:12px;padding:14px;font-size:18px;font-weight:700;line-height:1.3;text-align:center}
+#bild{display:none;text-align:center}#bild img{max-width:100%;max-height:28vh;border-radius:10px}
+#antworten{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1}
+.a{border:0;border-radius:12px;color:#fff;font-size:17px;font-weight:700;padding:14px 10px;min-height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;line-height:1.2}
+.a .f{font-size:26px}
+.a0{background:var(--r)}.a1{background:var(--b)}.a2{background:var(--y)}.a3{background:var(--g)}.a4{background:#864cbf}.a5{background:#0aa3a3}
+.a[disabled]{opacity:.35}.a.gewaehlt{opacity:1;outline:4px solid #fff}
+.reveal .a{opacity:.25}.reveal .a.ok{opacity:1;outline:4px solid #fff}
+#status{background:var(--card);border-radius:12px;padding:14px;text-align:center;font-size:17px;min-height:52px}
+#status.gut{background:var(--g)}#status.schlecht{background:var(--r)}
+#pausebox{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
+body.phase-pause #pausebox{display:flex}body.phase-pause #spiel{display:none}
+#pausebox h1{font-size:28px}#pausebox .big{font-size:56px;font-weight:800}#pausebox p{color:var(--muted);font-size:16px;line-height:1.4}
+#spiel{display:flex;flex-direction:column;gap:10px;flex:1}
+footer{font-size:12px;color:var(--muted);text-align:center}
+</style></head><body>
+<div id="app">
+<header><b>GSGB-Schulquiz · 50 Jahre</b><span id="punkte">0 Punkte</span></header>
+<div id="spiel">
+  <div id="zaehler" style="font-size:14px;color:var(--muted);text-align:center"></div>
+  <div id="bar"><i id="bari"></i></div>
+  <div id="frage"></div>
+  <div id="bild"><img id="img" alt=""></div>
+  <div id="antworten"></div>
+  <div id="status">Tippe die richtige Antwort an.</div>
+</div>
+<div id="pausebox"><h1>Runde vorbei</h1><div class="big" id="ergebnis">0</div><p id="ergtext"></p><p>Trag dich auf dem Highscore-Zettel an der Station ein.<br>Neue Runde in <b id="pauserest"></b> Sekunden. Bleib einfach auf dieser Seite.</p></div>
+<footer>Projektwoche 2026 · Digitales Schulquiz durch die Schulgeschichte</footer>
+</div>
+<script>
+const CFG={"runde": 25, "frage": 20, "loesung": 6, "pause": 30, "epoch": 1790827200000}, Q=[{"nr": "1", "frage": "Welche Männerfrisur war 2012 an unserer Schule am beliebtesten?", "antworten": ["Biebercut", "Taper-Fade", "Side-Swept-Fringe", "Vokuhila"], "korrekt": [1, 3], "bild": null}, {"nr": "4", "frage": "Wie heißt der blaue Stoff?", "antworten": ["Mangan-chlorid", "Natriumtetraborat", "Natriumhydrogencarbonat", "Eisen-sulfat"], "korrekt": [4], "bild": null}, {"nr": "5", "frage": "Wofür sind diese Schließfächer?", "antworten": ["Für Schulsachen", "Für Fundsachen", "Für die Biolehrkräfte", "Für Sportsachen"], "korrekt": [2], "bild": null}, {"nr": "6", "frage": "Wer sind die Vertrauenslehrer?", "antworten": ["Frau Krüger, Frau Keschwari, Herr Ulferts, Herr Meenderink", "Herr Krüger, Herr Keschwari, Frau Ulferts, Frau meenderink", "Frau Lorenz, Frau Schulte, Herr Heinrich, Herr Pfaffenrot", "Herr Lorenz, Herr Schulte, Frau Heinrich, Frau Pfaffenrot"], "korrekt": [1], "bild": null}, {"nr": "7", "frage": "Wohin führt der QR-Code am Haupteingang?", "antworten": ["zum Insta-Account der Schule", "zum Vertretungsplan", "zum Mensa Menü", "zur Schulwebsite"], "korrekt": [4], "bild": null}, {"nr": "8", "frage": "Wessen Partnerschule sind wir?", "antworten": ["Hannover 96", "FC Bayern München", "EC Hannover Indians", "Hannover Scorpions"], "korrekt": [1], "bild": null}, {"nr": "9", "frage": "Wer wurde hier gemalt?", "antworten": ["Hanz Schol", "Hans Schol", "Hans Scholl", "Hanz Scholl"], "korrekt": [3], "bild": null}, {"nr": "10", "frage": "Wo befindet sich diese Dusche?", "antworten": ["In der Sporthalle", "In der Aula", "In den Waschräumen", "Im Lehrerzimmr"], "korrekt": [2], "bild": null}, {"nr": "11", "frage": "Wem gehören die Fahrräder?", "antworten": ["den Sekretärinnen", "dem Hausmeister", "den Schülern", "den Lehrern"], "korrekt": [4], "bild": null}, {"nr": "12", "frage": "Wofür werden die Holzstäbe benutzt?", "antworten": ["für die Glimmspanprobe", "zum Kockeln", "das sind Duftstäbe", "das sind Zahnstocher"], "korrekt": [1], "bild": null}, {"nr": "13", "frage": "Wie lange braucht man zufuß vom Sekretäriat zur James Krüss Grundschule?", "antworten": ["ca. 5 min", "ca. 2,30 min", "ca. 6,30 min", "ca. 4 min"], "korrekt": [2], "bild": null}, {"nr": "14", "frage": "Wie oft hat die Schulglocke seit 1976 geklingelt?", "antworten": ["ca. 360000 mal", "ca. 800000 mal", "ca. 140000 mal", "ca. 1200000 mal"], "korrekt": [1], "bild": null}, {"nr": "15", "frage": "Wie viele Musiklehrerinnen gibt es am GSGB?", "antworten": ["7", "8", "5", "6"], "korrekt": [4], "bild": null}, {"nr": "16", "frage": "Wer wurde hier gemalt?", "antworten": ["Sophie Scholl", "Marie Curie", "Frau Lorenz", "Aurelia"], "korrekt": [1], "bild": null}, {"nr": "17", "frage": "Wofür ist die Absperrung?", "antworten": ["Für die Lehrkräfte", "Für die Oberstufe", "Für die Grundschüler", "Für die Oberschule"], "korrekt": [3], "bild": null}, {"nr": "20", "frage": "Was fehlt hier?", "antworten": ["ein Gemälde", "ein Schild", "eine Uhr", "gar nichts"], "korrekt": [3], "bild": null}, {"nr": "22", "frage": "Wer ist hier abgebildet?", "antworten": ["die Sekretärinnen", "zwei Lehrer", "Hanz & Sophia Scholl", "Hans & Sophie Scholl"], "korrekt": [4], "bild": null}, {"nr": "23", "frage": "Wie lange braucht man zu Fuß von der Bibliothek zu Raum 2.2?", "antworten": ["ca. 2 Minuten", "ca. 6 Minuten", "ca. 4 Minuten", "ca. 2 1/2 Minuten"], "korrekt": [3], "bild": null}, {"nr": "24", "frage": "Welcher Lehrer wurde aus der Rente zurückgeholt?", "antworten": ["Herr Heinrich", "Herr Knop", "Herr Müller", "Herr Warschau"], "korrekt": [2], "bild": null}, {"nr": "25", "frage": "Wer hat Popsongs für die Schüler gesungen?", "antworten": ["die Polizei", "die Feuerwehr", "die Lehrer", "das Jugendamt"], "korrekt": [1], "bild": null}, {"nr": "27", "frage": "Wem gehören diese Briefkästen?", "antworten": ["der Schulleitung und dem Sekretäriat", "den Vertrauenslehrern", "der James-krüss-Grundschule und deren Hausmeister", "dem Hausmeister und dem Sekretäriat"], "korrekt": [3], "bild": null}, {"nr": "28", "frage": "Welche Klassen bekommen Obstkörbe?", "antworten": ["nur die Oberstufe", "5&6 Klassen", "7&8 Klassen", "bis zur Oberstufe"], "korrekt": [2], "bild": null}, {"nr": "29", "frage": "Was ist in dem Spender?", "antworten": ["Desinfektionsmittel", "Seife", "Wasser", "Öl"], "korrekt": [1], "bild": null}, {"nr": "30", "frage": "Welches Gerät ist das?", "antworten": ["Underhead-Projektor", "Overhead-Projektor", "Drucker", "Beamer"], "korrekt": [2], "bild": null}, {"nr": "34", "frage": "Welches Buch wird am häufigsten ausgeliehen?", "antworten": ["Greggs Tagebuch", "Lotta-Leben", "Der kleine Drache Kokosnuss", "Harry Potter"], "korrekt": [1], "bild": null}, {"nr": "35", "frage": "Wieviele Krökeltische gibt es insgesamt am GSGB?", "antworten": ["2", "1", "5", "7"], "korrekt": [3], "bild": null}, {"nr": "38", "frage": "Wieviele Basketballkörbe befinden sich in der SAH?", "antworten": ["6", "7", "10", "16"], "korrekt": [3], "bild": null}, {"nr": "39", "frage": "Wer war der meist gewählte Lehrer der „Schollz 2024“?", "antworten": ["Herr Brüntjen", "Herr Timme", "Herr Ihlau", "Herr Roggenland"], "korrekt": [3], "bild": null}, {"nr": "40", "frage": "Wie viele Jahre gibt es das Geschwister-Scholl-Gymnasium 2026?", "antworten": ["40 Jahre", "45 Jahre", "50 Jahre", "55 Jahre"], "korrekt": [3], "bild": null}, {"nr": "41", "frage": "Nach wem ist das Geschwister-Scholl-Gymnasium benannt?", "antworten": ["Albert und Friedrich Scholl", "Hans und Sophie Scholl", "Max und Sophie Scholl", "Hans und Karl Scholl"], "korrekt": [2], "bild": null}, {"nr": "42", "frage": "Welcher Widerstandsgruppe gehörten Hans und Sophie Scholl an?", "antworten": ["Die Weiße Rose", "Die Rote Rose", "Die Schwarze Rose", "Die Blaue Rose"], "korrekt": [1], "bild": null}, {"nr": "43", "frage": "Das GSG wurde 1976 gegründet.", "antworten": ["Richtig", "Falsch"], "korrekt": [1], "bild": null}, {"nr": "44", "frage": "Wie lautet das Motto des Geschwister-Scholl-Gymnasiums?", "antworten": ["Lernen fürs Leben", "Gemeinsam sind wir stark", "Fördern durch Fordern!", "Schule mit Zukunft"], "korrekt": [3], "bild": null}, {"nr": "45", "frage": "Welche dieser Sprachen kann man am GSG als Fremdsprache lernen?", "antworten": ["Spanisch", "Französisch", "Latein", "Alle drei"], "korrekt": [4], "bild": null}, {"nr": "46", "frage": "Das GSG hat einen Schüleraustausch mit einer Schule in Polen.", "antworten": ["Richtig", "Falsch"], "korrekt": [1], "bild": null}, {"nr": "47", "frage": "In welcher polnischen Stadt befindet sich die Partnerschule des GSG?", "antworten": ["Warschau", "Krakau", "Września", "Danzig"], "korrekt": [3], "bild": null}, {"nr": "48", "frage": "Was ist 2026 ein besonderes Ereignis für das GSG?", "antworten": ["25-jähriges Jubiläum", "40-jähriges Jubiläum", "50-jähriges Jubiläum", "75-jähriges Jubiläum"], "korrekt": [3], "bild": null}, {"nr": "49", "frage": "Was findet 2026 anlässlich des Schuljubiläums statt?", "antworten": ["Eine Projektwoche", "Ein Schulfestival über einen Monat", "Eine Klassenfahrt für die gesamte Schule", "Eine Sportmeisterschaft"], "korrekt": [1], "bild": null}, {"nr": "50", "frage": "Welches Instrument wird in der Big Band Berenbostel nicht gespielt?", "antworten": ["Trompete", "Streicher", "Schlagzeug"], "korrekt": [2], "bild": null}, {"nr": "51", "frage": "Wie viele Dächer hat der Mittelgang im Hauptgebäude?", "antworten": ["4", "1", "3"], "korrekt": [3], "bild": null}, {"nr": "52", "frage": "wie viele Uhren gibt es auf den Fluren im Hautgebäude?", "antworten": ["0", "7", "4"], "korrekt": [2], "bild": null}, {"nr": "53", "frage": "Wurde die Aula erst später erbaut?", "antworten": ["ja", "nein"], "korrekt": [1], "bild": null}, {"nr": "54", "frage": "Wer hat alles einen Schlüssel zum Instrumentenlager?", "antworten": ["Jeder", "nur der Hausmeister", "Schüler die Blasinstrumente spielen"], "korrekt": [3], "bild": null}, {"nr": "55", "frage": "Wie viele Klassen gibt es an unserer Schule ( Jahrgang 5-10)?", "antworten": ["30", "31", "25"], "korrekt": [2], "bild": null}, {"nr": "56", "frage": "Wie viele Unterrichtsräume gibt es im Hauptgebäude?", "antworten": ["50", "30", "25"], "korrekt": [2], "bild": null}, {"nr": "57", "frage": "Hat die Big Band Berenbostel einen Tourbus?", "antworten": ["Ja", "nein"], "korrekt": [1], "bild": null}, {"nr": "58", "frage": "Was sind die beliebtesten Bücher in der Bibliothek?", "antworten": ["Harry Potter", "Lotta Leben", "Gregs Tagebuch"], "korrekt": [2, 3], "bild": null}, {"nr": "59", "frage": "Wie viele Toilettenräume gibt es im Hauptgebäude ?", "antworten": ["4", "6", "7"], "korrekt": [3], "bild": null}, {"nr": "60", "frage": "Welche Farbe hatten die Bundstifte der Bushaltestelle bevor sie blau wurden?", "antworten": ["Bund", "rot", "es gab sie vorher nicht"], "korrekt": [1], "bild": null}, {"nr": "61", "frage": "Wie viele Schüler spielen in der Big Band Berenbostel?", "antworten": ["40", "25", "10"], "korrekt": [2], "bild": null}, {"nr": "62", "frage": "Welcher Klassenraum ist der kleinste", "antworten": ["58", "15", "60"], "korrekt": [3], "bild": null}, {"nr": "63", "frage": "Wie viele Etagen hat die James-Krüss-Grundschule und das Hauptgebäude zusammen ?", "antworten": ["7", "4", "10"], "korrekt": [1], "bild": null}, {"nr": "64", "frage": "Was gab es 1976 noch nicht an unserer Schule?", "antworten": ["Overheadprojektor", "Digitale Tafeln", "Tafeln mit Kreide"], "korrekt": [2], "bild": null}, {"nr": "65", "frage": "Seit wann sind wir Partnerschule des Hannover 96?", "antworten": ["8.Februar 2026", "22.12.2025", "21.05.2026"], "korrekt": [1], "bild": null}, {"nr": "66", "frage": "Seit welchem Schuljahr ist Herr Pfaffenrot an unserer Schule?", "antworten": ["18/19", "25/26", "21/22"], "korrekt": [3], "bild": null}, {"nr": "67", "frage": "Welcher Lehrer unterrichtet am längsten am GSGB?", "antworten": ["Herr Ulferts, Herr Strüber, Frau Kornacker", "Herr ockenfels , Herr hess, Frau foury-feesche", "Frau Drabben-thiemann, Frau Bettels, Herr meibaum"], "korrekt": [3], "bild": null}, {"nr": "73", "frage": "Warum wurde das Flachdach ausgetauscht?", "antworten": ["Weil Schüler auf das Dach geklettert sind", "Weil es eingekracht ist", "Weil es reingeregnet hat", "Weil es hässlich war"], "korrekt": [3], "bild": null}, {"nr": "74", "frage": "Welcher dieser Femdsprachen wird am GSGB angeboten?", "antworten": ["Japanisch", "Niederländisch", "Latein", "Schweden"], "korrekt": [3], "bild": null}, {"nr": "75", "frage": "Wann öffnen die Schulgebäude laut Schulordnung?", "antworten": ["1900-01-01 07:00:00", "1900-01-01 07:30:00", "1900-01-01 07:45:00", "1900-01-01 08:00:00"], "korrekt": [3], "bild": null}, {"nr": "76", "frage": "Welche besondere Bezeichnung trägt unsere Schule?", "antworten": ["Europaschule", "Umweltschule", "UNESCO-Schule", "Hogwards"], "korrekt": [1], "bild": null}, {"nr": "77", "frage": "Wo ist die Handynutzung währed der Pause laut Schulordnung unter anderem verboten?", "antworten": ["Auf dem Schulhof", "In der Mensa und dem ganzen Schulgebäude", "Nur im Sekretariat", "An der Bushaltestelle"], "korrekt": [2], "bild": null}, {"nr": "78", "frage": "Wo dürfen sich Schüler der Klassen 5-10 in der Pause unter anderem aufhalten?", "antworten": ["In der Mensa, wenn sie dort etwas kaufen oder essen", "Im Lehrerzimmer", "Am Badepark", "Auf dem Lehrerparkplatz"], "korrekt": [1], "bild": null}, {"nr": "79", "frage": "Wie viele Klassenverbände gibt es am GSGB?", "antworten": ["24", "84", "54", "33"], "korrekt": [4], "bild": null}, {"nr": "80", "frage": "Ab welcher Klassenstufe kann man am GSGB eine zweite Fremdsprache lernen?", "antworten": ["5. Klasse", "7.Klasse", "6.Klasse", "10.Klasse"], "korrekt": [3], "bild": null}, {"nr": "81", "frage": "Welchen Abschluss kann man am GSGB machen?", "antworten": ["Meisterbrief", "Nur Realabschluss", "Abitur", "Nur Hauptschulabschluss"], "korrekt": [3], "bild": null}, {"nr": "82", "frage": "Wofür steht das \"B\" in der Abkürzung GSGB", "antworten": ["Bildung", "Berenbostel", "Beruf", "Bundesgymnasium"], "korrekt": [2], "bild": null}], PERM=[32, 36, 2, 16, 42, 60, 19, 17, 7, 54, 59, 1, 11, 48, 58, 33, 28, 24, 26, 50, 23, 18, 29, 31, 65, 3, 45, 13, 25, 8, 10, 51, 0, 37, 62, 41, 61, 27, 39, 38, 56, 4, 12, 52, 53, 47, 6, 22, 9, 55, 35, 43, 14, 20, 64, 5, 21, 49, 30, 44, 15, 57, 40, 46, 34, 63];
+
+let OFFSET=0;
+async function syncZeit(){
+  try{ const t0=Date.now(); const r=await fetch(location.href,{method:"HEAD",cache:"no-store"}); const t1=Date.now();
+    const d=r.headers.get("date"); if(d){ const age=parseInt(r.headers.get("age")||"0",10)||0;
+      const srv=new Date(d).getTime()+age*1000+500+(t1-t0)/2; OFFSET=srv-t1; } }catch(e){}
+}
+function jetzt(){ return (Date.now()+OFFSET-CFG.epoch)/1000; }
+function plan(t){
+  const slot=CFG.frage+CFG.loesung, rl=CFG.runde*slot+CFG.pause;
+  const r=Math.floor(t/rl), w=t-r*rl;
+  if(w>=CFG.runde*slot) return {runde:r,phase:"pause",rest:rl-w,k:CFG.runde};
+  const k=Math.floor(w/slot), s=w-k*slot;
+  if(s<CFG.frage) return {runde:r,phase:"frage",rest:CFG.frage-s,k:k,elapsed:s};
+  return {runde:r,phase:"loesung",rest:slot-s,k:k};
+}
+function frage(r,k){ return Q[PERM[((r*CFG.runde+k)%PERM.length+PERM.length)%PERM.length]]; }
+function esc(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+const FORM=["▲","◆","●","■","★","✚"];
+
+let st=lade(), shown=null;
+function lade(){ try{ const s=JSON.parse(localStorage.getItem("gsgbquiz")||"null"); if(s&&typeof s.runde==="number") return s }catch(e){} return {runde:-1,ant:{}} }
+function speichern(){ try{ localStorage.setItem("gsgbquiz",JSON.stringify(st)) }catch(e){} }
+function summe(){ let p=0,ri=0,n=0; for(const k in st.ant){n++; p+=st.ant[k].punkte; if(st.ant[k].richtig) ri++} return {p,ri,n} }
+function zeige(r,k){
+  const q=frage(r,k);
+  document.getElementById("frage").textContent=q.frage;
+  document.getElementById("zaehler").textContent="Runde "+(r+1)+" · Frage "+(k+1)+" von "+CFG.runde;
+  const b=document.getElementById("bild"); if(q.bild){document.getElementById("img").src=q.bild; b.style.display="block"} else b.style.display="none";
+  const A=document.getElementById("antworten"); A.innerHTML="";
+  q.antworten.forEach((t,n)=>{const d=document.createElement("button");d.className="a a"+n+(q.korrekt.includes(n+1)?" ok":"");d.innerHTML='<span class="f">'+FORM[n]+'</span><span>'+esc(t)+'</span>';d.onclick=()=>wahl(r,k,n+1);A.appendChild(d)});
+  A.style.gridTemplateColumns=q.antworten.length>4?"1fr 1fr 1fr":"1fr 1fr";
+  document.getElementById("app").classList.remove("reveal");
+  const a=st.ant[k]; if(a){ sperren(a.wahl); setStatus("Antwort gespeichert ✓","") } else setStatus("Tippe die richtige Antwort an.","");
+}
+function sperren(w){ document.querySelectorAll("#antworten .a").forEach((d,n)=>{ d.disabled=true; d.classList.toggle("gewaehlt",n+1===w) }) }
+function setStatus(t,c){ const s=document.getElementById("status"); s.textContent=t; s.className=c }
+function wahl(r,k,w){
+  const p=plan(jetzt()); if(p.phase!=="frage"||p.runde!==r||p.k!==k||st.ant[k]) return;
+  const q=frage(r,k); const richtig=q.korrekt.includes(w);
+  const punkte=richtig?Math.round(1000*(1-(p.elapsed/CFG.frage)/2)):0;
+  st.ant[k]={wahl:w,richtig:richtig,punkte:punkte}; speichern(); sperren(w); setStatus("Antwort gespeichert ✓",""); malPunkte();
+}
+function malPunkte(){ document.getElementById("punkte").textContent=summe().p+" Punkte" }
+function tick(){
+  const p=plan(jetzt());
+  if(p.runde!==st.runde){ st={runde:p.runde,ant:{}}; speichern(); shown=null; malPunkte(); }
+  document.body.classList.toggle("phase-pause",p.phase==="pause");
+  if(p.phase==="pause"){ const s=summe(); document.getElementById("ergebnis").textContent=s.p+" Punkte"; document.getElementById("ergtext").textContent=s.ri+" von "+CFG.runde+" richtig"; document.getElementById("pauserest").textContent=Math.ceil(p.rest); shown=null; return; }
+  const key=p.runde+":"+p.k; if(key!==shown){ zeige(p.runde,p.k); shown=key; }
+  if(p.phase==="frage"){ document.getElementById("bari").style.width=(100*p.rest/CFG.frage)+"%"; }
+  else { document.getElementById("bari").style.width="0%"; document.getElementById("app").classList.add("reveal");
+    const a=st.ant[p.k]; if(!a) setStatus("Keine Antwort. Nächste Frage gleich.","schlecht"); else if(a.richtig) setStatus("Richtig! +"+a.punkte+" Punkte","gut"); else setStatus("Leider falsch.","schlecht"); }
+}
+malPunkte(); syncZeit().then(tick); setInterval(syncZeit,300000); setInterval(tick,250);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden){ syncZeit(); shown=null; } });
+</script></body></html>
