@@ -11,7 +11,7 @@ body.pause{cursor:default}
 #konfetti{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 #konfetti i{position:absolute;top:-3vh;display:block;opacity:.75;border-radius:.1vh;animation:fall linear infinite}
 @keyframes fall{0%{transform:translateY(-3vh) rotate(0deg)}100%{transform:translateY(105vh) rotate(720deg)}}
-#app{position:relative;z-index:1;display:grid;grid-template-columns:1fr 15vw;grid-template-rows:auto 1fr auto;height:100vh;gap:1.6vh;padding:1.6vh 1.6vw}
+#app{position:relative;z-index:1;display:grid;grid-template-columns:1fr 18vw;grid-template-rows:auto 1fr auto;height:100vh;gap:1.6vh;padding:1.6vh 1.6vw}
 header{grid-column:1/3;display:flex;justify-content:space-between;align-items:center;border-bottom:.25vh solid var(--gold);padding-bottom:1vh}
 .marke{display:flex;align-items:center;gap:1.4vw}
 .fuenfzig{width:8.5vh;height:8.5vh;border-radius:50%;background:var(--gold);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:4.6vh;font-weight:900;box-shadow:0 0 0 .5vh var(--bg),0 0 0 .8vh var(--gold)}
@@ -20,15 +20,15 @@ header{grid-column:1/3;display:flex;justify-content:space-between;align-items:ce
 #zaehler{font-size:2.4vh;color:var(--muted)}
 main{display:flex;flex-direction:column;gap:1.6vh;min-height:0}
 #frage{background:var(--cream);color:#1a1a1a;border:.5vh solid var(--gold);border-radius:1.4vh;padding:2vh 3vw;font-size:4.4vh;font-weight:700;line-height:1.25;text-align:center;display:flex;align-items:center;justify-content:center;min-height:16vh}
-main.mitbild #frage{min-height:7vh;font-size:3.4vh;padding:1vh 3vw}
+main.mitbild #frage{min-height:9vh;font-size:4.2vh;padding:1.2vh 3vw}
 #bild{flex:1;min-height:0;display:none;align-items:center;justify-content:center}
 main.mitbild #bild{display:flex}
 #bild img{max-height:100%;max-width:100%;border-radius:1.2vh;border:.4vh solid var(--gold);object-fit:contain;background:#000}
 #antworten{display:grid;grid-template-columns:1fr 1fr;gap:1.6vh;flex:1;min-height:0}
 main.mitbild #antworten{flex:0 0 auto}
 .a{border-radius:1.2vh;display:flex;align-items:center;gap:1.5vw;padding:1.6vh 2vw;font-size:3.8vh;font-weight:700;transition:opacity .4s,transform .4s;min-height:10vh;box-shadow:0 .4vh 1.2vh rgba(0,0,0,.35)}
-main.mitbild .a{font-size:2.8vh;min-height:6.5vh;padding:.8vh 1.6vw}
-.a .f{font-size:4.6vh;width:5.5vh;text-align:center;flex:none}
+main.mitbild .a{font-size:3.4vh;min-height:8vh;padding:1vh 1.6vw}
+.a .f{font-size:4.2vh;width:5vh;text-align:center;flex:none}
 .a0{background:var(--r)}.a1{background:var(--b)}.a2{background:var(--y)}.a3{background:var(--g)}.a4{background:#6f3fa6}.a5{background:#0a8f8f}
 .reveal .a{opacity:.15}.reveal .a.ok{opacity:1;transform:scale(1.03);box-shadow:0 0 0 .8vh var(--gold) inset,0 0 3vh var(--gold)}
 .a .hak{margin-left:auto;font-size:4.6vh;display:none}.reveal .a.ok .hak{display:block}
@@ -38,7 +38,7 @@ aside{display:flex;flex-direction:column;gap:1.6vh;min-height:0}
 #timer small{display:block;font-size:2.2vh;color:var(--muted);font-weight:400;margin-top:.6vh}
 #mit{flex:1;display:flex;flex-direction:column;justify-content:center;gap:1.2vh}
 #mit h2{font-size:2.6vh;color:var(--gold)}#mit .site{font-size:1.7vh;color:var(--muted);word-break:break-all}
-#qr{background:#fff;border-radius:1vh;padding:.8vh;aspect-ratio:1/1;width:100%;max-width:11vw;margin:0 auto;box-shadow:0 0 0 .4vh var(--gold)}
+#qr{background:#fff;border-radius:1vh;padding:.8vh;aspect-ratio:1/1;width:100%;max-width:13vw;margin:0 auto;box-shadow:0 0 0 .4vh var(--gold)}
 #qr svg{width:100%;height:100%;display:block}
 footer{grid-column:1/3;display:flex;justify-content:space-between;font-size:2vh;color:var(--muted);border-top:.15vh solid rgba(226,185,59,.4);padding-top:.8vh}
 #hint{opacity:0;transition:opacity .5s}body.pause #hint{opacity:1}
