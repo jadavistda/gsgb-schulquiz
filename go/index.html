@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Schulquiz · Start setzen</title>
+<style>
+body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#0a1a3a;color:#fff;margin:0;padding:20px;max-width:520px;margin:0 auto}
+h1{color:#e2b93b;font-size:24px}label{display:block;margin:14px 0 6px;color:#b9c3d9}
+input{width:100%;box-sizing:border-box;font-size:22px;padding:12px;border-radius:10px;border:2px solid #e2b93b;background:#13274d;color:#fff}
+button{width:100%;font-size:22px;font-weight:800;padding:16px;margin-top:18px;border:0;border-radius:12px;background:#e2b93b;color:#0a1a3a}
+#aus{margin-top:18px;padding:14px;border-radius:10px;background:#13274d;font-size:17px;line-height:1.5;white-space:pre-wrap}
+small{color:#b9c3d9;display:block;margin-top:14px;line-height:1.4}a{color:#e2b93b}
+.ok{color:#8fe08f}.err{color:#ff8a8a}
+</style></head><body>
+<h1>Schulquiz · Start setzen</h1>
+<div id="aktuell">Aktuell: …</div>
+<label>Datum</label><input id="datum" type="date">
+<label>Quiz startet um (Uhrzeit)</label><input id="zeit" type="time" step="1">
+<button onclick="setzen()">Startzeit setzen</button>
+<div id="aus"></div>
+<small>Boards ohne Internet: eine Minute vor der Startzeit Play bzw. „Quiz starten" drücken (60 s Countdown).<br>
+Handys und Boards mit Internet übernehmen die Zeit innerhalb von ca. 1 Minute von selbst.<br>
+<a href="#" onclick="schluessel(true);return false">GitHub-Schlüssel eingeben/ändern</a> · <a href="../">zum Kiosk</a></small>
+<script>
+const REPO="jadavistda/quiz", DATEI="start.json";
+const heute=new Date(); document.getElementById("datum").value=heute.toISOString().slice(0,10);
+function schluessel(neu){ let t=null; try{t=localStorage.getItem("ghtoken")}catch(e){} if(!t||neu){ t=prompt("GitHub-Schlüssel (Fine-grained token, Contents: Read and write, nur Repo quiz):",t||""); if(t){ t=t.trim(); try{localStorage.setItem("ghtoken",t)}catch(e){} } } return t; }
+function pad(n){return String(n).padStart(2,"0")}
+async function zeige(){ try{ const r=await fetch("../start.json?z="+Date.now(),{cache:"no-store"}); const s=await r.json(); const d=new Date(s.epoch); document.getElementById("aktuell").textContent="Aktuell gesetzt: "+d.toLocaleDateString("de-DE")+" "+d.toLocaleTimeString("de-DE")+" (Boards drücken um "+(s.druck_text||"")+")"; }catch(e){} }
+zeige();
+async function setzen(){
+  const aus=document.getElementById("aus"); const tok=schluessel(false); if(!tok){ aus.innerHTML='<span class="err">Kein Schlüssel.</span>'; return; }
+  const dv=document.getElementById("datum").value, zv=document.getElementById("zeit").value; if(!dv||!zv){ aus.innerHTML='<span class="err">Datum und Uhrzeit eingeben.</span>'; return; }
+  const [y,m,d]=dv.split("-").map(Number); const [h,mi,s]=(zv.length===5?zv+":00":zv).split(":").map(Number);
+  const start=new Date(y,m-1,d,h,mi,s||0); const druck=new Date(start.getTime()-60000);
+  const js={epoch:start.getTime(),start_text:pad(h)+":"+pad(mi)+":"+pad(s||0),druck_text:pad(druck.getHours())+":"+pad(druck.getMinutes())+":"+pad(druck.getSeconds())};
+  aus.textContent="Setze …";
+  try{
+    const H={"Authorization":"Bearer "+tok,"Accept":"application/vnd.github+json","Content-Type":"application/json"};
+    const g=await fetch(`https://api.github.com/repos/${REPO}/contents/${DATEI}`,{headers:H}); if(!g.ok) throw new Error("Lesen fehlgeschlagen ("+g.status+"). Schlüssel prüfen.");
+    const sha=(await g.json()).sha;
+    const inhalt=btoa(unescape(encodeURIComponent(JSON.stringify(js)+"\n")));
+    const p=await fetch(`https://api.github.com/repos/${REPO}/contents/${DATEI}`,{method:"PUT",headers:H,body:JSON.stringify({message:"GO: Start "+js.start_text,content:inhalt,sha:sha})});
+    if(!p.ok) throw new Error("Schreiben fehlgeschlagen ("+p.status+"). Schlüssel braucht Contents: Read and write.");
+    aus.innerHTML='<span class="ok">Gesetzt.</span> QUIZ STARTET '+js.start_text+' Uhr.\nAN DEN BOARDS DRÜCKEN UM '+js.druck_text+' (Handy-Uhr).\nWarte auf Veröffentlichung …';
+    for(let i=0;i<40;i++){ await new Promise(r=>setTimeout(r,5000)); try{ const r=await fetch("../start.json?z="+Date.now(),{cache:"no-store"}); const c=await r.json(); if(c.epoch===js.epoch){ aus.innerHTML+='\n<span class="ok">Live nach '+(i+1)*5+' s. Handys übernehmen innerhalb von 20 s.</span>'; zeige(); return; } }catch(e){} }
+    aus.innerHTML+='\n<span class="err">Noch nicht live, Seite später neu laden.</span>';
+  }catch(e){ aus.innerHTML='<span class="err">'+e.message+'</span>'; }
+}
+</script></body></html>
