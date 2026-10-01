@@ -1,5 +1,5 @@
 # GSGB-Schulquiz · 50 Jahre
 
-Kiosk und Mitspiel-Seite, Adressen siehe QR.
+Kiosk: `https://jadavistda.github.io/gsgb-schulquiz/` · Mitspielen: `https://jadavistda.github.io/gsgb-schulquiz/spielen/`
 
 Erzeugt mit `ProWo 2026/Schleife/quiz_bauen.py` am 2026-10-01.
