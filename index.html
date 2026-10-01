@@ -14,7 +14,7 @@ body.pause{cursor:default}
 #app{position:relative;z-index:1;display:grid;grid-template-columns:1fr 18vw;grid-template-rows:auto 1fr auto;height:100vh;gap:1.6vh;padding:1.6vh 1.6vw}
 header{grid-column:1/3;display:flex;justify-content:space-between;align-items:center;border-bottom:.25vh solid var(--gold);padding-bottom:1vh}
 .marke{display:flex;align-items:center;gap:1.4vw}
-.fuenfzig{width:8.5vh;height:8.5vh;border-radius:50%;background:var(--gold);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:4.6vh;font-weight:900;box-shadow:0 0 0 .5vh var(--bg),0 0 0 .8vh var(--gold)}
+.logo{height:11vh;width:auto;background:#fff;border-radius:1.2vh;padding:.6vh;box-shadow:0 0 0 .4vh var(--gold)}
 .marke h1{font-size:4.2vh;line-height:1.05;color:var(--gold)}
 .marke small{display:block;font-size:2.1vh;color:var(--muted);font-family:-apple-system,"Segoe UI",Arial,sans-serif;font-weight:400;margin-top:.5vh}
 #zaehler{font-size:2.4vh;color:var(--muted)}
@@ -45,7 +45,7 @@ footer{grid-column:1/3;display:flex;justify-content:space-between;font-size:2vh;
 </style></head><body>
 <div id="konfetti"></div>
 <div id="app">
-<header><div class="marke"><div class="fuenfzig serif">50</div><h1 class="serif">Jahre GSGB<small>Eine Schule, viele Spuren · 1976–2026</small></h1></div><span id="zaehler"></span></header>
+<header><div class="marke"><img class="logo" src="logo.png" alt="GSGB 50 Jahre"><h1 class="serif">Schulquiz<small>Eine Schule, viele Spuren · 1976–2026</small></h1></div><span id="zaehler"></span></header>
 <main id="main">
   <div id="frage"></div>
   <div id="bild"><img id="img" alt=""></div>
